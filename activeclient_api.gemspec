@@ -1,7 +1,7 @@
 require_relative "lib/active_client/version"
 
 Gem::Specification.new do |spec|
-  spec.name        = "activeclient"
+  spec.name        = "activeclient_api"
   spec.version     = ActiveClient::VERSION
   spec.authors     = ["Nick Pezza"]
   spec.email       = ["pezza@hey.com"]

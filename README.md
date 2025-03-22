@@ -66,7 +66,7 @@ end
 Add this line to your application's Gemfile:
 
 ```ruby
-gem "activeclient"
+gem "activeclient_api"
 ```
 
 And then execute:
@@ -76,7 +76,7 @@ $ bundle
 
 Or install it yourself as:
 ```bash
-$ gem install activeclient
+$ gem install activeclient_api
 ```
 
 ## License
