@@ -50,7 +50,7 @@ class ActiveClient::Base
       if skip_parsing
         body
       else
-        JSON.parse(body)
+        deep_inheritable_options(JSON.parse(body))
       end
     end
 
@@ -113,6 +113,21 @@ class ActiveClient::Base
         all_credentials.each do |s|
           loggable.gsub!(s, "[FILTERED]")
         end
+      end
+    end
+
+    def deep_inheritable_options(obj)
+      case obj
+      when Hash
+        inherited = ActiveSupport::InheritableOptions.new
+        obj.each do |key, value|
+          inherited[key] = deep_inheritable_options(value)
+        end
+        inherited
+      when Array
+        obj.map { |v| deep_inheritable_options(v) }
+      else
+        obj
       end
     end
 end
