@@ -29,7 +29,9 @@ class ActiveClient::Base
 
     def instrument(klass:, path:, query:, body:)
       uri, http, request = construct_request(klass:, path:, query:)
-      request.body = default_body.merge(body).to_json if body.present?
+
+      set_body(request, body)
+
       loggable = loggable_uri(uri)
       args = { name: self.class.name.demodulize, uri: loggable }
 
@@ -61,7 +63,7 @@ class ActiveClient::Base
       http.use_ssl = uri.instance_of?(URI::HTTPS)
       http.read_timeout = 1200
 
-      [uri, http, klass.new(uri.request_uri, default_headers)]
+      [uri, http, klass.new(uri.request_uri, default_headers(klass))]
     end
 
     def construct_uri(path:, query:)
@@ -78,7 +80,7 @@ class ActiveClient::Base
       uri.query = URI.encode_www_form(default_query.merge(query))
     end
 
-    def default_headers
+    def default_headers(_klass)
       { "Accept" => "application/json",
         "Content-Type" => "application/json" }
     end
@@ -116,7 +118,7 @@ class ActiveClient::Base
       end
     end
 
-    def deep_inheritable_options(obj)
+    def deep_inheritable_options(obj) # rubocop:disable Metrics/MethodLength
       case obj
       when Hash
         inherited = ActiveSupport::InheritableOptions.new
@@ -129,5 +131,18 @@ class ActiveClient::Base
       else
         obj
       end
+    end
+
+    def set_body(request, body)
+      if body.present? &&
+        request["Content-Type"] == "application/x-www-form-urlencoded"
+        set_form_data(request, body)
+      elsif body.present?
+        request.body = default_body.merge(body).to_json
+      end
+    end
+
+    def set_form_data(request, body)
+      request.set_form_data(default_body.merge(body))
     end
 end
