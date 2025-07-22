@@ -1,19 +1,6 @@
 class ActiveClient::Base
   Response = Struct.new(:body, :success?)
 
-  def self.with_persistent_connection(&)
-    @http = Net::HTTP::Persistent.new name: "gemini"
-
-    yield
-
-    @http.shutdown
-    @http = nil
-  end
-
-  def self.http
-    @http
-  end
-
   def get(path, skip_parsing: false, **query)
     make_request(Net::HTTP::Get, path, skip_parsing:, query:)
   end
@@ -49,17 +36,12 @@ class ActiveClient::Base
       args = { name: self.class.name.demodulize, uri: loggable }
 
       ActiveSupport::Notifications.
-        instrument("request.active_client", args) { yield uri, http, request }
+        instrument("request.active_client", args) { yield http, request }
     end
 
     def make_request(klass, path, skip_parsing: false, query: {}, body: {})
-      instrument(klass:, path:, query:, body:) do |uri, http, request|
-        response =
-          if http.is_a?(Net::HTTP::Persistent)
-            http.request(uri, request)
-          else
-            http.request(request)
-          end
+      instrument(klass:, path:, query:, body:) do |http, request|
+        response = http.request(request)
 
         Response.new(parse_response(response.body, skip_parsing),
                      response.is_a?(Net::HTTPSuccess))
@@ -77,11 +59,10 @@ class ActiveClient::Base
     def construct_request(klass:, path:, query:)
       uri = construct_uri(path:, query:)
 
-      http =
-        self.class.http.presence || Net::HTTP.new(uri.host, uri.port).tap do
-          it.use_ssl = uri.instance_of?(URI::HTTPS)
-          it.read_timeout = 1200
-        end
+      http = Net::HTTP.new(uri.host, uri.port).tap do
+        it.use_ssl = uri.instance_of?(URI::HTTPS)
+        it.read_timeout = 1200
+      end
 
       [uri, http, klass.new(uri.request_uri, default_headers(klass))]
     end

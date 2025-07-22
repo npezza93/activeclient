@@ -14,6 +14,5 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,db,lib,vendor}/**/*", "LICENSE.md",
                    "Rakefile", "README.md"]
 
-  spec.add_dependency "net-http-persistent"
   spec.add_dependency "rails", "~> 8.0"
 end
