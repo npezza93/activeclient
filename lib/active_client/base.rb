@@ -52,7 +52,7 @@ class ActiveClient::Base
       if skip_parsing
         body
       else
-        deep_inheritable_options(JSON.parse(body))
+        deep_inheritable_options(ActiveSupport::JSON.decode(body))
       end
     end
 
