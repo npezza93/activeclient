@@ -52,7 +52,8 @@ class ActiveClient::Base
       if skip_parsing
         body
       else
-        deep_inheritable_options(ActiveSupport::JSON.decode(body))
+        deep_inheritable_options(ActiveSupport::JSON.
+          send(:convert_dates_from, JSON.parse(body)))
       end
     end
 
