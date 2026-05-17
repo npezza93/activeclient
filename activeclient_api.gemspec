@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.license     = "MIT"
 
   spec.metadata["rubygems_mfa_required"] = "true"
-  spec.required_ruby_version = ">= 3.4.0"
+  spec.required_ruby_version = ">= 4.0"
   spec.files = Dir["{app,config,db,lib,vendor}/**/*", "LICENSE.md",
                    "Rakefile", "README.md"]
 

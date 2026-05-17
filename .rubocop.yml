@@ -18,7 +18,7 @@ AllCops:
     - db/*_schema.rb
     - db/queue_migrate/**/*
     - db/insights_migrate/**/*
-  TargetRubyVersion: 3.4
+  TargetRubyVersion: 4.0
 
 # Department Bundler
 Bundler/DuplicatedGem:
@@ -1756,3 +1756,5 @@ Rails/WhereNotWithMultipleConditions:
 
 Layout/IndentationConsistency:
   EnforcedStyle: indented_internal_methods
+Style/ItBlockParameter:
+  Enabled: false
